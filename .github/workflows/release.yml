@@ -26,10 +26,10 @@ jobs:
           echo "name=PRERELEASE::$(grep -qE '^0' <'./data/version' && echo 'true' || echo 'false')" >> "$GITHUB_ENV"
           
       - name: Create Tag
-        uses: tvdias/github-tagger@v0.0.2
+        uses: negz/create-tag@v1
         with:
-          tag: ${{ env.VERSION }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: ${{ env.VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Release
         uses: softprops/action-gh-release@v0.1.5
