@@ -100,12 +100,15 @@ function main {
     echo -en "\033[$((line + offset));2H"
   done
 
+  clear
+
   local i=0
   for t in "${toggles[@]}"; do
     if "$t"; then
+      printf "Installing ${names[$i]}...\n"
       mkdir -p "${tmp}/${names[$i]}" 2>/dev/null
       tar -xzf "$(get_util "${urls[$i]}" "${names[$i]}")" -C "${tmp}/${names[$i]}"
-      "${tmp}/${names[$i]}/install.sh"
+      (cd "${tmp}/${names[$i]}" && "./install.sh")
     fi
     i=$((i + 1))
   done
