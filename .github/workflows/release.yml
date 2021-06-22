@@ -27,7 +27,7 @@ jobs:
           echo "::set-env name=PRERELEASE::$(grep -qE '^0' <'./data/version' && echo 'true' || echo 'false')"
 
       - name: Release
-        uses: "m3l6h/utilities@${{ env.VERSION }}"
+        uses: softprops/action-gh-release@v0.1.5
         with:
           body: ${{ env.CHANGELOG }}
           name: "${{ env.APP_NAME }} ${{ env.VERSION }}"
