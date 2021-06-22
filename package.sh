@@ -6,7 +6,7 @@ dist="${base_dir}/dist"
 
 mkdir "$dist" >/dev/null 2>&1
 rm "$dist"/*.tar.gz 2>/dev/null
-tar -cvf "${dist}/${app}-$(<"${base_dir}/data/version").tar.gz" \
+tar -czvf "${dist}/${app}-$(<"${base_dir}/data/version").tar.gz" \
   data/ \
   scripts/ \
   .app \
