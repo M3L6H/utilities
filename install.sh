@@ -20,7 +20,7 @@ echo "Checking for '${app}'..."
 which "$app" > /dev/null 2>&1
 
 if [ "$?" -eq '0' ]; then
-  echo "${YELLOW}'${app}' found. Uninstall by running the uninstall script.${NF}"
+  printf "${YELLOW}'${app}' found. Uninstall by running the uninstall script.${NF}\n"
   exit 1
 fi
 
