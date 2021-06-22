@@ -7,7 +7,7 @@ GREEN="\e[32m"
 RED="\e[31m"
 YELLOW="\e[33m"
 
-app="$(cat $(dirname "$0")/.app)"
+app="$(cat "$(dirname "$0")/.app")"
 
 printf "${BLUE}'$app' will be reinstalled (y/N)${NF}"
 read -sr -n 1 ans

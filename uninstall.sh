@@ -7,7 +7,7 @@ GREEN="\e[32m"
 RED="\e[31m"
 YELLOW="\e[33m"
 
-app="$(cat $(dirname "$0")/.app)"
+app="$(cat "$(dirname "$0")/.app")"
 
 printf "${RED}${BOLD}Are you sure you want to uninstall '${app}'? (y/N)${NF}"
 read -sr -n 1 ans

@@ -8,7 +8,7 @@ RED="\e[31m"
 YELLOW="\e[33m"
 
 bin="$HOME/.local/bin"
-app="$(cat $(dirname "$0")/.app)"
+app="$(cat "$(dirname "$0")/.app")"
 
 printf "Welcome to the ${BOLD}${app}${NF} installer\n"
 printf "This installer will guide you through the process of installing ${BOLD}${app}${NF} on your system\n"
