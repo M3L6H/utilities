@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.2.0 --
+Migrate config to a subcommand
+
 -- v0.1.2 --
 Fix shebang in reinstall.sh and uninstall.sh
 

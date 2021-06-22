@@ -16,6 +16,6 @@ Run `gacp` with the `-m` flag to provide a commit message. If no files are
 specified, it runs `git add .` by default. Otherwise it will add the files
 specified to the commit.
 
-Configure `gacp` by running it with the `-g` flag. As of now, the only thing
+Configure with `gacp config`. As of now, the only thing
 that can be configured is the file limit `gacp` will abort at. This can be
-configured by running `gacp -gl <new limit>`.
+configured by running `gacp config -l <new limit>`.

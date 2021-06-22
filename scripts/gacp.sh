@@ -8,19 +8,36 @@ usage="Usage: gacp -m <commit message> [files to commit]"
 
 read -r -d '' help <<EOF
 ${usage}
+
+Subcommands:
+  c         Alias for config
+  config    Configure gacp. Use 'gacp config -h' for more info
+  configure Alias for config
+
 Options:
   -f  Force gacp to ignore its limits. This does NOT run a force push. Instead,
       gacp will ignore things such as the limit on number of files to push.
-  -g  Configure gacp. Currently accepted flags for configuration are:
-      -l  Configure file limit (default: 3)
-          Example usage: gacp -gl 5
   -h  Print help
   -l  Sets a limit on the number of files to commit before 'gacp' aborts
   -m  Specify commit message
   -u  Automatically run with '--set-upstream origin <current branch>'
 
 Details:
-$(cat ${data}/README.md)
+  https://github.com/M3L6H/utilities/tree/gacp
+EOF
+
+read -r -d '' help_config <<EOF
+Usage: gacp config [-l limit]
+
+Aliases: c, configure
+
+Description:
+  Configures gacp. When run without flags, prints out the current gacp
+  configuration.
+
+Options:
+  -h  Print help
+  -l  Configure the default file limit
 EOF
 
 read -r -d '' limitwarning <<EOF
@@ -53,14 +70,24 @@ limit=""
 message=""
 setUpstream=false
 
-while getopts ":cfghl:m:uv" opt; do
+# Parse sub-commands
+OPTIND=2
+case "$1" in
+  'c'|'config'|'configure')
+    configure=true
+    help="$help_config"
+  ;;
+  *) OPTIND=1 ;;
+esac
+
+# Parse args
+while getopts ":cfhl:m:uv" opt; do
   case "$opt" in
   c)
     cat "${data}/CHANGELOG.md" | less
     exit 0
   ;;
   f) force=true ;;
-  g) configure=true ;;
   h)
     echo "$help" | less
     exit 0
@@ -81,6 +108,27 @@ while getopts ":cfghl:m:uv" opt; do
 done
 
 if $configure; then
+  configured=false
+  if [ -n "$limit" ]; then
+    if [ "$limit" -gt "$HARDLIMIT" ]; then
+      echo "$limitwarning"
+      exit 1
+    elif [ "$limit" -lt 1 ]; then
+      echo "Limit cannot be less than 1! Got '${limit}'."
+      exit 1
+    fi
+
+    echo "$limit" > "$data/.limit"
+    printf "${GREEN}Default limit set to '${limit}'${NF}\n"
+    configured=true
+  fi
+
+  if ! "$configured"; then
+    echo "Printing current configuration..."
+    echo "limit: $(<"$data/.limit")"
+  fi
+  exit 0
+elif [ -z "$message" ]; then
   echo "Commit message is required!"
   echo "$usage"
   exit 1
