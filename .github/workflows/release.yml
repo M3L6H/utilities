@@ -23,14 +23,13 @@ jobs:
         run: |
           echo "name=APP_NAME::$(<'./.app')" >> "$GITHUB_ENV"
           echo "name=VERSION::$(<'./data/version')" >> "$GITHUB_ENV"
-          echo "name=CHANGELOG::'$(<'./CHANGELOG.md')'" >> "$GITHUB_ENV"
           echo "name=PRERELEASE::$(grep -qE '^0' <'./data/version' && echo 'true' || echo 'false')" >> "$GITHUB_ENV"
 
       - name: Release
         uses: softprops/action-gh-release@v0.1.5
         with:
-          body: ${{ env.CHANGELOG }}
           name: "${{ env.APP_NAME }} ${{ env.VERSION }}"
           prerelease: ${{ env.PRERELEASE }}
+          body_path: ./CHANGELOG.md
           files: |
             ./dist/*.tar.gz
