@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.1.2 --
+Fix shebang in reinstall.sh and uninstall.sh
+
 -- v0.1.1 --
 Fix error message when trying to install gacp while it is already installed
 

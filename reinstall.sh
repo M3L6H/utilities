@@ -1,4 +1,4 @@
-#!/bin.bash
+#!/bin/bash
 
 NF="\e[0m"
 BOLD="\e[1m"
