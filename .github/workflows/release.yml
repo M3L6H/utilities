@@ -21,10 +21,10 @@ jobs:
         
       - name: Set Variables
         run: |
-          echo "::set-env name=APP_NAME::$(<'./app')"
-          echo "::set-env name=VERSION::$(<'./data/version')"
-          echo "::set-env name=CHANGELOG::$(<'./CHANGELOG.md')"
-          echo "::set-env name=PRERELEASE::$(grep -qE '^0' <'./data/version' && echo 'true' || echo 'false')"
+          echo "name=APP_NAME::$(<'./app')" >> "$GITHUB_ENV"
+          echo "name=VERSION::$(<'./data/version')" >> "$GITHUB_ENV"
+          echo "name=CHANGELOG::$(<'./CHANGELOG.md')" >> "$GITHUB_ENV"
+          echo "name=PRERELEASE::$(grep -qE '^0' <'./data/version' && echo 'true' || echo 'false')" >> "$GITHUB_ENV"
 
       - name: Release
         uses: softprops/action-gh-release@v0.1.5
