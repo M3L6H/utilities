@@ -1,0 +1,36 @@
+name: Release
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push events for all branches except master
+  push:
+    branches-ignore: 
+      - 'master'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Runs a single command using the runners shell
+      - name: Package app
+        run: ./package.sh
+        
+      - name: Set Variables
+        run: |
+          echo "::set-env name=APP_NAME::$(<'./app')"
+          echo "::set-env name=VERSION::$(<'./data/version')"
+          echo "::set-env name=CHANGELOG::$(<'./CHANGELOG.md')"
+          echo "::set-env name=PRERELEASE::$(grep -qE '^0' <'./data/version' && echo 'true' || echo 'false')"
+
+      - name: Release
+        uses: "m3l6h/utilities@${{ env.VERSION }}"
+        with:
+          body: ${{ env.CHANGELOG }}
+          name: "${{ env.APP_NAME }} ${{ env.VERSION }}"
+          prerelease: ${{ env.PRERELEASE }}
+          files: |
+            ./dist/*.tar.gz
