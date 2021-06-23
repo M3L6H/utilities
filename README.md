@@ -16,4 +16,4 @@ process of installing the utilities in this repository.
 
 ## Index
 
-- [gacp - A github utility that automates the process of git add, commit, and push](https://github.com/M3L6H/utilities/tree/gacp)
+- [gacp](https://github.com/M3L6H/utilities/tree/gacp) - A github utility that automates the process of git add, commit, and push ![gacp release badge](https://github.com/m3l6h/utilities/actions/workflows/release.yml/badge.svg?branch=gacp)
