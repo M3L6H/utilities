@@ -25,16 +25,11 @@ jobs:
           echo "VERSION=v$(<'./data/version')" >> "$GITHUB_ENV"
           echo "PRERELEASE=$(grep -qE '^0' <'./data/version' && echo 'true' || echo 'false')" >> "$GITHUB_ENV"
           echo "RELEASE=$(curl -sH 'Accept: application/vnd.github.v3+jso' -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/m3l6h/utilities/releases | grep -q "gacp v$(<'./data/version')" && echo 'true' || echo 'false')" >> "$GITHUB_ENV"
-
-      - name: Query Tag
-        id: tagger
-        uses: jimschubert/query-tag-action@v2
-        with:
-          include: ${{ env.VERSION }}
+          echo "MAKE_TAG=$(git fetch --prune --unshallow && git describe --tags -abbrev=0 --match "v$('./data/version')" 'HEAD~' && echo 'false' || echo 'true')" >> "$GITHUB_ENV"
 
       - name: Create Tag
         uses: negz/create-tag@v1
-        if: ${{ ! steps.tagger.outputs.tag }}
+        if: ${{ env.MAKE_TAG }}
         with:
           version: ${{ env.VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
