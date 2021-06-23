@@ -5,7 +5,7 @@ career.
 
 ## How to Install
 
-The simplest way to install one or multiple of these utilities is to run
+The simplest way to install one or more of these utilities is to run
 
 ```sh
 bash <(curl -s 'https://raw.githubusercontent.com/M3L6H/utilities/master/download.sh')
