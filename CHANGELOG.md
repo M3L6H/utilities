@@ -1,5 +1,6 @@
 # Changelog
 
+Wed Jun 23 08:26:53 PDT 2021 - Update download script to install with -y
 Wed Jun 23 08:24:34 PDT 2021 - Update release.yml
 Mon Jun 21 23:34:42 PDT 2021 - Update README with instructions for download
 Mon Jun 21 23:22:31 PDT 2021 - Get download.sh working

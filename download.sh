@@ -108,7 +108,7 @@ function main {
       printf "Installing ${names[$i]}...\n"
       mkdir -p "${tmp}/${names[$i]}" 2>/dev/null
       tar -xzf "$(get_util "${urls[$i]}" "${names[$i]}")" -C "${tmp}/${names[$i]}"
-      (cd "${tmp}/${names[$i]}" && "./install.sh")
+      (cd "${tmp}/${names[$i]}" && ./install.sh -y)
     fi
     i=$((i + 1))
   done
