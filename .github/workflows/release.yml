@@ -25,7 +25,7 @@ jobs:
           echo "RELEASE=${RELEASE}" >> "$GITHUB_ENV"
           [ "$RELEASE" = 'true' ] && ./package.sh
           git fetch --prune --unshallow
-          git describe --tags --abbrev=0 --match "$(<'./.app') v$(<'./data/version')" 'HEAD~' >/dev/null 2&>1 || \
+          git describe --tags --abbrev=0 --match "$(<'./.app')-v$(<'./data/version')" 'HEAD~' >/dev/null 2&>1 || \
           (git tag "$VERSION" && git push origin --tag "$VERSION")
           echo "MAKE_TAG=${make_tag}" >> "$GITHUB_ENV"
 
