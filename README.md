@@ -1,5 +1,7 @@
 # Git Add Commit Push
 
+![release badge](https://github.com/m3l6h/utilities/actions/workflows/release.yml/badge.svg?branch=gacp)
+
 A utility that combines `git add`, `git commit`, and `git push` into one
 command.
 
