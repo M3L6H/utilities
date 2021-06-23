@@ -1,13 +1,11 @@
 name: Release
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push events for all branches except master
   push:
-    branches-ignore: 
+    branches-ignore:
       - 'master'
-      
-  workflow_dispatch:
 
 jobs:
   build:
@@ -20,19 +18,33 @@ jobs:
       # Runs a single command using the runners shell
       - name: Package app
         run: ./package.sh
-        
+
       - name: Set Variables
         run: |
-          echo "::set-env name=APP_NAME::$(<'./app')"
-          echo "::set-env name=VERSION::$(<'./data/version')"
-          echo "::set-env name=CHANGELOG::$(<'./CHANGELOG.md')"
-          echo "::set-env name=PRERELEASE::$(grep -qE '^0' <'./data/version' && echo 'true' || echo 'false')"
+          echo "APP_NAME=$(<'./.app')" >> "$GITHUB_ENV"
+          echo "VERSION=v$(<'./data/version')" >> "$GITHUB_ENV"
+          echo "PRERELEASE=$(grep -qE '^0' <'./data/version' && echo 'true' || echo 'false')" >> "$GITHUB_ENV"
+          echo "RELEASE=$(curl -sH 'Accept: application/vnd.github.v3+jso' -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/m3l6h/utilities/releases | grep -q "gacp v$(<'./data/version')" && echo 'false' || echo 'true')" >> "$GITHUB_ENV"
+          git fetch --prune --unshallow
+          git describe --tags --abbrev=0 --match "v$(<'./data/version')" 'HEAD~' && make_tag='false' || make_tag='true'
+          echo "MAKE_TAG=${make_tag}" >> "$GITHUB_ENV"
+
+      - name: Create Tag
+        uses: negz/create-tag@v1
+        if: env.MAKE_TAG == 'true'
+        with:
+          version: ${{ env.VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Release
-        uses: "m3l6h/utilities@${{ env.VERSION }}"
+        uses: softprops/action-gh-release@master
+        if: env.RELEASE == 'true'
         with:
-          body: ${{ env.CHANGELOG }}
           name: "${{ env.APP_NAME }} ${{ env.VERSION }}"
           prerelease: ${{ env.PRERELEASE }}
+          body_path: ./CHANGELOG.md
+          tag_name: ${{ env.VERSION }}
           files: |
             ./dist/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
