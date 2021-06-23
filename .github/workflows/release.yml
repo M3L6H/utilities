@@ -22,11 +22,11 @@ jobs:
       - name: Set Variables
         run: |
           echo "APP_NAME=$(<'./.app')" >> "$GITHUB_ENV"
-          echo "VERSION=v$(<'./data/version')" >> "$GITHUB_ENV"
+          echo "VERSION=$(<'./.app') v$(<'./data/version')" >> "$GITHUB_ENV"
           echo "PRERELEASE=$(grep -qE '^0' <'./data/version' && echo 'true' || echo 'false')" >> "$GITHUB_ENV"
           echo "RELEASE=$(curl -sH 'Accept: application/vnd.github.v3+jso' -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/m3l6h/utilities/releases | grep -q "gacp v$(<'./data/version')" && echo 'false' || echo 'true')" >> "$GITHUB_ENV"
           git fetch --prune --unshallow
-          git describe --tags --abbrev=0 --match "v$(<'./data/version')" 'HEAD~' && make_tag='false' || make_tag='true'
+          git describe --tags --abbrev=0 --match "$(<'./.app') v$(<'./data/version')" 'HEAD~' && make_tag='false' || make_tag='true'
           echo "MAKE_TAG=${make_tag}" >> "$GITHUB_ENV"
 
       - name: Create Tag
