@@ -17,23 +17,29 @@ jobs:
 
       - name: Set Variables
         run: |
-          echo "APP_NAME=$(<'./.app')" >> "$GITHUB_ENV"
+          APP_NAME="$(<'./.app') v$(<'./data/version')"
+          echo "APP_NAME=${APP_NAME}" >> "$GITHUB_ENV"
+
           VERSION="$(<'./.app')-v$(<'./data/version')"
           echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+
           echo "PRERELEASE=$(grep -qE '^0' <'./data/version' && echo 'true' || echo 'false')" >> "$GITHUB_ENV"
+
           RELEASE="$(curl -sH 'Accept: application/vnd.github.v3+jso' -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/m3l6h/utilities/releases | grep -q "gacp v$(<'./data/version')" && echo 'false' || echo 'true')"
           echo "RELEASE=${RELEASE}" >> "$GITHUB_ENV"
           [ "$RELEASE" = 'true' ] && ./package.sh
+
           git fetch --prune --unshallow
-          git tag | grep -q "$(<'./.app')-v$(<'./data/version')" || \
-          (git tag "$VERSION" && git push origin --tag "$VERSION")
+          git tag | grep -q "$VERSION" || \
+            (git tag "$VERSION" && git push origin --tag "$VERSION")
+
           echo "MAKE_TAG=${make_tag}" >> "$GITHUB_ENV"
 
       - name: Release
         uses: softprops/action-gh-release@master
         if: env.RELEASE == 'true'
         with:
-          name: "${{ env.APP_NAME }} ${{ env.VERSION }}"
+          name: "${{ env.APP_NAME }}"
           prerelease: ${{ env.PRERELEASE }}
           body_path: ./CHANGELOG.md
           tag_name: ${{ env.VERSION }}
