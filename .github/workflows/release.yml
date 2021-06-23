@@ -31,14 +31,14 @@ jobs:
 
       - name: Create Tag
         uses: negz/create-tag@v1
-        if: ${{ env.MAKE_TAG }}
+        if: env.MAKE_TAG == 'true'
         with:
           version: ${{ env.VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Release
         uses: softprops/action-gh-release@master
-        if: ${{ env.RELEASE }}
+        if: env.RELEASE == 'true'
         with:
           name: "${{ env.APP_NAME }} ${{ env.VERSION }}"
           prerelease: ${{ env.PRERELEASE }}
