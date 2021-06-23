@@ -8,7 +8,7 @@ career.
 The simplest way to install one or multiple of these utilities is to run
 
 ```sh
-$ bash <(curl -s 'https://raw.githubusercontent.com/M3L6H/utilities/master/download.sh')
+bash <(curl -s 'https://raw.githubusercontent.com/M3L6H/utilities/master/download.sh')
 ```
 
 You will be provided with a guided prompt that will walk you through the
