@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.2.1 --
+Add -y flag to the installer
+
 -- v0.2.0 --
 Migrate config to a subcommand
 
