@@ -1,5 +1,6 @@
 # Changelog
 
+Wed Jun 23 11:38:53 PDT 2021 - Update download script to print nicely on small screens and to select latest version with the "select all" key
 Wed Jun 23 08:28:13 PDT 2021 - Change "one or multiple" to "one or more"
 Wed Jun 23 08:26:53 PDT 2021 - Update download script to install with -y
 Wed Jun 23 08:24:34 PDT 2021 - Update release.yml
