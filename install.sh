@@ -9,11 +9,22 @@ YELLOW="\e[33m"
 
 bin="$HOME/.local/bin"
 app="$(cat "$(dirname "$0")/.app")"
+skip_prompts=false
+
+while getopts ":y" opt; do
+  case "$opt" in
+  y) skip_prompts=true ;;
+  *)
+    echo "Unrecognized argument"
+    exit 1
+  ;;
+  esac
+done
 
 printf "Welcome to the ${BOLD}${app}${NF} installer\n"
 printf "This installer will guide you through the process of installing ${BOLD}${app}${NF} on your system\n"
 printf "${BLUE}Press any key to continue${NF}\n"
-read -sr -n 1
+"$skip_prompts" || read -sr -n 1
 
 echo "Checking for '${app}'..."
 
@@ -28,11 +39,11 @@ echo "'${app}' not found. Installing '${app}'..."
 
 while true; do
   printf "${BLUE}Enter the path where you would like to install '${app}' (default: '${bin}'): ${NF}"
-  read tmp
+  "$skip_prompts" || read tmp
 
   [ -n "$tmp" ] && bin="$tmp"
   printf "${BLUE}'${app}' will be added to '${bin}' (y/N)${NF}"
-  read -sr -n 1 ans
+  "$skip_prompts" && ans='y' || read -sr -n 1 ans
   echo
   case "$ans" in
     y|Y) break ;;
@@ -73,5 +84,5 @@ else
   printf "${YELLOW}If you already have one, then please add \"export PATH=${bin}:\$PATH\" to it${NF}\n"
   printf "${YELLOW}If not, you will need to create on and add the above line to it${NF}\n"
   printf "${BLUE}After reading the above note, press any key to continue${NF}\n"
-  read -sr -n 1
+  "$skip_prompts" || read -sr -n 1
 fi
