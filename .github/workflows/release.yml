@@ -25,8 +25,15 @@ jobs:
           echo "VERSION=$(<'./data/version')" >> "$GITHUB_ENV"
           echo "PRERELEASE=$(grep -qE '^0' <'./data/version' && echo 'true' || echo 'false')" >> "$GITHUB_ENV"
           
+      - name: Query Tag
+        id: tagger
+        uses: jimschubert/query-tag-action@v2
+        with:
+          include: ${{ env.VERSION }}
+          
       - name: Create Tag
         uses: negz/create-tag@v1
+        if: ${{ ! steps.tagger.outputs.tag }}
         with:
           version: ${{ env.VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
