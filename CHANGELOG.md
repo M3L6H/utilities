@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.4.8 --
+Fix bug with regex comparison when pulling jq
+
 -- v0.4.7 --
 Pull appropriate version of jq based on OS
 
