@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.3.1 --
+Add check to prevent "upgrading" to the version already installed
+
 -- v0.3.0 --
 Add update subcommand
 

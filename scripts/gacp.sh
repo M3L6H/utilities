@@ -215,6 +215,12 @@ function greater_than {
 function update {
   get_versions
   [ -z "$version" ] && version="${versions[0]}"
+
+  if [ "${version#*-v}" = "$(<"${data}/version")" ]; then
+    printf "Version ${version} of gapc is already installed\n"
+    return 1
+  fi
+
   download_url="$("$jq" -r '.[].assets[0].browser_download_url' <<<"$res" | grep "${version//-v/-}")"
   cd "${tmp}"
   curl -sL "$download_url" -o "gacp.tar.gz"
