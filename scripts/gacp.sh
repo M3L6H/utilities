@@ -246,6 +246,14 @@ function greater_than {
   return 1
 }
 
+function list_versions {
+  get_versions
+  for version in "${versions[@]}"; do
+    grep -q "$(<${data}/version)" <<<"$version" && printf "${GREEN}*"
+    printf "${version}${NF}\n"
+  done
+}
+
 function update {
   get_versions
   [ -z "$version" ] && version="${versions[0]}"
@@ -358,11 +366,7 @@ case "$1" in
       case "$opt" in
       h) help_msg ;;
       l)
-        get_versions
-        for version in "${versions[@]}"; do
-          grep -q "$(<${data}/version)" <<<"$version" && printf "${GREEN}*"
-          printf "${version}${NF}\n"
-        done
+        list_versions | less -X
         exit 0
       ;;
       v) version="$OPTARG" ;;

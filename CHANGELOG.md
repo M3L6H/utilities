@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.4.3 --
+Pipe version listing into less
+
 -- v0.4.2 --
 Fix copy in reinstall.sh
 
