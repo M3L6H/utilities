@@ -19,7 +19,8 @@ function gcurl {
 }
 
 function get_jq {
-  local jq_remote=$(gcurl https://api.github.com/repos/stedolan/jq/releases/latest | sed -nE 's/^.*"browser_download_url": "(.*linux64).*$/\1/p')
+  local os="$([ "$OSTYPE" ~= 'darwin' ] && echo 'osx-amd64' || echo 'linux64')"
+  local jq_remote=$(gcurl https://api.github.com/repos/stedolan/jq/releases/latest | sed -nE "s/^.*\"browser_download_url\": \"(.*${os}).*$/\1/p")
   curl -sL "$jq_remote" -o "$jq"
   chmod u+x "$jq"
 }
