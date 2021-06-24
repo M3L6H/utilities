@@ -171,7 +171,8 @@ function gcurl {
 }
 
 function get_jq {
-  jq_remote='https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64'
+  local os="$([ "$OSTYPE" ~= 'darwin' ] && echo 'osx-amd64' || echo 'linux64')"
+  local jq_remote="https://github.com/stedolan/jq/releases/download/jq-1.6/jq-${os}"
   curl -sL "$jq_remote" -o "$jq"
   chmod u+x "$jq"
 }

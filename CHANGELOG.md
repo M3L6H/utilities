@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.4.7 --
+Pull appropriate version of jq based on OS
+
 -- v0.4.6 --
 Update tmpdir to support Mac OSX
 
