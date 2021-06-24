@@ -2,7 +2,7 @@
 
 authentication="$1"
 escape_char=$(printf '\u1b')
-tmp='/var/tmp'
+tmp="${TMPDIR-/tmp}"
 jq="${tmp}/jq"
 repo='https://api.github.com/repos/m3l6h/utilities'
 releases="${repo}/releases"
