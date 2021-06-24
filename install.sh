@@ -69,10 +69,57 @@ for shell_config in "${shell_configs[@]}"; do
 done
 
 cp "$(dirname "$0")/scripts/${app}.sh" "$bin/$app"
-mkdir "${HOME}/.${app}"
-cp -a "$(dirname "$0")/data/." "${HOME}/.${app}/"
-cp $(dirname "$0")/*.md "${HOME}/.${app}/"
+data="${HOME}/.${app}"
+mkdir -p "$data"
+cp -a "$(dirname "$0")/data/." "$data"
+cp $(dirname "$0")/*.md "$data"
 chmod u+x "${bin}/${app}"
+
+# Get jq
+tmp='/var/tmp'
+jq="${tmp}/jq"
+
+jq_remote='https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64'
+curl -sL "$jq_remote" -o "$jq"
+chmod u+x "$jq"
+
+# Device login
+while true; do
+  echo "Retrieving token for updating gacp..."
+
+  res="$(curl -sX POST -H 'Content-Type: application/json' -H 'Accept: application/json' --data "{\
+    \"client_id\": \"$(<"${data}/client")\" \
+  }" 'https://github.com/login/device/code')"
+
+  device_code="$("$jq" -r '.device_code' <<<"$res")"
+  user_code="$("$jq" -r '.user_code' <<<"$res")"
+  verification_uri="$("$jq" -r '.verification_uri' <<<"$res")"
+  expires_in="$("$jq" -r '.expires_in' <<<"$res")"
+  interval="$("$jq" -r '.interval' <<<"$res")"
+
+  printf "${BLUE}Please open '${verification_uri}' in your browser and enter the code: '${user_code}'${NF}\n"
+
+  while [ "$expires_in" -gt 0 ]; do
+    res="$(curl -sX POST -H 'Content-Type: application/json' -H 'Accept: application/json' --data "{\
+      \"client_id\": \"$(<"${data}/client")\", \
+      \"device_code\": \"${device_code}\", \
+      \"grant_type\": \"urn:ietf:params:oauth:grant-type:device_code\"
+    }" 'https://github.com/login/oauth/access_token')"
+    token="$("$jq" -r '.access_token' <<<"$res")"
+
+    if [ "$token" != 'null' ]; then
+      echo "$token" >> "${data}/.token"
+      break
+    fi
+
+    sleep "$interval"
+    expires_in=$((expires_in - time))
+  done
+
+  [ "$token" != 'null' ] && break
+done
+
+printf "${GREEN}Token successfully configured${NF}\n"
 
 printf "${GREEN}${app} successfully installed.${NF}\n"
 printf "${GREEN}Run it using '${app}' or create an alias for it in your shell config file.${NF}\n"

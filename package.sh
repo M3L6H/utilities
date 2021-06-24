@@ -13,5 +13,7 @@ tar -czvf "${dist}/${app}-$(<"${base_dir}/data/version").tar.gz" \
   install.sh \
   reinstall.sh \
   uninstall.sh \
+  upgrade.sh \
+  downgrade.sh \
   README.md \
   CHANGELOG.md

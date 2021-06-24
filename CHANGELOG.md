@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.3.0 --
+Add update subcommand
+
 -- v0.2.1 --
 Add -y flag to the installer
 

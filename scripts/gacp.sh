@@ -13,6 +13,9 @@ Subcommands:
   c         Alias for config
   config    Configure gacp. Use 'gacp config -h' for more info
   configure Alias for config
+  u         Alias for update
+  update    Update gacp. Use 'gacp update -h' for more info
+  upgrade   Alias for update
 
 Options:
   -f  Force gacp to ignore its limits. This does NOT run a force push. Instead,
@@ -26,6 +29,8 @@ Details:
   https://github.com/M3L6H/utilities/tree/gacp
 EOF
 
+usage_config="Usage: gacp config [-l limit]"
+
 read -r -d '' help_config <<EOF
 Usage: gacp config [-l limit]
 
@@ -38,6 +43,25 @@ Description:
 Options:
   -h  Print help
   -l  Configure the default file limit
+EOF
+
+usage_update="Usage: gacp update [-v version]"
+
+read -r -d '' help_update <<EOF
+Usage: gacp update [-v version]
+       gacp update -l
+
+Aliases: u, upgrade
+
+Description:
+  Updates gacp. When run without flags, updates to the latest gacp version. If
+  the -v flag was passed, it will update to the specified version.
+  List available versions by running it with -l.
+
+Options:
+  -h  Print help
+  -l  List available versions
+  -v  Update to a specific version
 EOF
 
 read -r -d '' limitwarning <<EOF
@@ -61,7 +85,10 @@ NF="\e[0m"
 GREEN="\e[32m"
 RED="\e[31m"
 
-# Script start
+# Global vars
+tmp='/var/tmp'
+jq="${tmp}/jq"
+
 OPTIND=1 # Used to parse arguments after flags
 
 configure=false
@@ -70,44 +97,70 @@ limit=""
 message=""
 setUpstream=false
 
-# Parse sub-commands
-OPTIND=2
-case "$1" in
-  'c'|'config'|'configure')
-    configure=true
-    help="$help_config"
-  ;;
-  *) OPTIND=1 ;;
-esac
+# Functions
+function help_msg {
+  echo "$help" | less
+  exit 0
+}
 
-# Parse args
-while getopts ":cfhl:m:uv" opt; do
-  case "$opt" in
-  c)
-    cat "${data}/CHANGELOG.md" | less
-    exit 0
-  ;;
-  f) force=true ;;
-  h)
-    echo "$help" | less
-    exit 0
-  ;;
-  l) limit="$OPTARG" ;;
-  m) message="$OPTARG" ;;
-  u) setUpstream=true ;;
-  v)
-    cat "${data}/version"
-    exit 0
-  ;;
-  *)
-    echo "Unrecognized argument"
-    echo "$usage"
-    exit 1
-  ;;
-  esac
-done
+function unrecognized_argument {
+  echo "Unrecognized argument"
+  echo "$usage"
+  exit 1
+}
 
-if $configure; then
+function gcurl {
+  local token="$(<"${data}/.token")"
+
+  if [ -z "$token" ]; then
+    while true; do
+      echo "Retrieving token for updating gacp..."
+
+      res="$(curl -sX POST -H 'Content-Type: application/json' -H 'Accept: application/json' --data "{\
+        \"client_id\": \"$(<"${data}/client")\" \
+      }" 'https://github.com/login/device/code')"
+
+      device_code="$("$jq" -r '.device_code' <<<"$res")"
+      user_code="$("$jq" -r '.user_code' <<<"$res")"
+      verification_uri="$("$jq" -r '.verification_uri' <<<"$res")"
+      expires_in="$("$jq" -r '.expires_in' <<<"$res")"
+      interval="$("$jq" -r '.interval' <<<"$res")"
+
+      printf "${BLUE}Please open '${verification_uri}' in your browser and enter the code: '${user_code}'${NF}\n"
+
+      while [ "$expires_in" -gt 0 ]; do
+        res="$(curl -sX POST -H 'Content-Type: application/json' -H 'Accept: application/json' --data "{\
+          \"client_id\": \"$(<"${data}/client")\", \
+          \"device_code\": \"${device_code}\", \
+          \"grant_type\": \"urn:ietf:params:oauth:grant-type:device_code\"
+        }" 'https://github.com/login/oauth/access_token')"
+        token="$("$jq" -r '.access_token' <<<"$res")"
+
+        if [ "$token" != 'null' ]; then
+          echo "$token" >> "${data}/.token"
+          break
+        fi
+
+        sleep "$interval"
+        expires_in=$((expires_in - time))
+      done
+
+      [ "$token" != 'null' ] && break
+    done
+
+    printf "${GREEN}Token successfully configured${NF}\n"
+  fi
+
+  curl -sH "Authorization: Bearer ${token}" -H 'Accept: application/vnd.github.v3+json' "$@"
+}
+
+function get_jq {
+  jq_remote='https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64'
+  curl -sL "$jq_remote" -o "$jq"
+  chmod u+x "$jq"
+}
+
+function configure {
   configured=false
   if [ -n "$limit" ]; then
     if [ "$limit" -gt "$HARDLIMIT" ]; then
@@ -128,43 +181,160 @@ if $configure; then
     echo "limit: $(<"$data/.limit")"
   fi
   exit 0
-elif [ -z "$message" ]; then
-  echo "Commit message is required!"
-  echo "$usage"
-  exit 1
-fi
+}
 
-# Get default values for arguments
-[ -z "$limit" ] && limit="$(<"$data/.limit")"
+function get_versions {
+  get_jq
+  res="$(gcurl "https://api.github.com/repos/$(<"${data}/remote")/releases")"
+  IFS=$'\n' versions=($("$jq" -r '.[].tag_name' <<<"$res" | grep 'gacp'))
+}
 
-if [ "$limit" -gt "$HARDLIMIT" ]; then
-  echo "$limitwarning"
-  exit 1
-fi
+function random {
+  tr -dc A-Za-z0-9 </dev/urandom | head -c 13
+  echo ''
+}
 
-# Shift off the already-parsed arguments
-shift $((OPTIND-1))
-[ "${1:-}" = "--" ] && shift
+# Expects the following args:
+#   $1: version a
+#   $2: version b
+# Performs the comparison a > b on major.minor.patch semantic versions
+function greater_than {
+  local a="$1" b="$2"
+  local major_a="${a%.*.*}" major_b="${b%.*.*}"
+  local suffix_a="${a#*.}" suffix_b="${b#*.}"
+  local minor_a="${suffix_a%.*}" minor_b="${suffix_b%.*}"
+  local patch_a="${suffix_a#*.}" patch_b="${suffix_b#*.}"
 
-if [ -z "$*" ]; then
-  git add .
-else
-  git add $*
-fi
+  [ "$major_a" -gt "$major_b" ] && return 0
+  [ "$minor_a" -gt "$minor_b" ] && return 0
+  [ "$patch_a" -gt "$patch_b" ] && return 0
 
-numfiles=`git diff --cached --numstat | wc -l | xargs`
+  return 1
+}
 
-if ! $force && [ "$numfiles" -gt "$limit" ]; then
-  printf "${RED}gacp aborted!${NF}\n"
-  printf "${RED}${numfiles} were staged for commit, but only ${limit} are allowed${NF}\n"
-  git reset
-  exit 1
-fi
+function update {
+  get_versions
+  [ -z "$version" ] && version="${versions[0]}"
+  download_url="$("$jq" -r '.[].assets[0].browser_download_url' <<<"$res" | grep "${version//-v/-}")"
+  cd "${tmp}"
+  curl -sL "$download_url" -o "gacp.tar.gz"
+  local gacp="${tmp}/$(random)"
+  mkdir -p "$gacp"
+  tar -xzf "${tmp}/gacp.tar.gz" -C "$gacp"
 
-git commit -m "$message"
+  greater_than "${version#*-v}" "$(<"${data}/version")" && \
+    "${gacp}/upgrade.sh" || \
+    "${gacp}/downgrade.sh"
 
-if ! $setUpstream; then
-  git push
-else
-  git push --set-upstream origin "$(git branch --show-current)"
-fi
+  "${gacp}/reinstall.sh" -y
+}
+
+function main {
+  if [ -z "$message" ]; then
+    echo "Commit message is required!"
+    echo "$usage"
+    exit 1
+  fi
+
+  # Get default values for arguments
+  [ -z "$limit" ] && limit="$(<"$data/.limit")"
+
+  if [ "$limit" -gt "$HARDLIMIT" ]; then
+    echo "$limitwarning"
+    exit 1
+  fi
+
+  # Shift off the already-parsed arguments
+  shift $((OPTIND-1))
+  [ "${1:-}" = "--" ] && shift
+
+  if [ -z "$*" ]; then
+    git add .
+  else
+    git add "$@"
+  fi
+
+  numfiles=`git diff --cached --numstat | wc -l | xargs`
+
+  if ! $force && [ "$numfiles" -gt "$limit" ]; then
+    printf "${RED}gacp aborted!${NF}\n"
+    printf "${RED}${numfiles} were staged for commit, but only ${limit} are allowed${NF}\n"
+    git reset
+    exit 1
+  fi
+
+  git commit -m "$message"
+
+  if ! $setUpstream; then
+    git push
+  else
+    git push --set-upstream origin "$(git branch --show-current)"
+  fi
+
+}
+
+# Parse sub-commands
+OPTIND=2
+case "$1" in
+  'c'|'config'|'configure')
+    operation='configure'
+    help="$help_config"
+    usage="$usage_config"
+
+    while getopts ":hl:" opt; do
+      case "$opt" in
+      h) help_msg ;;
+      l) limit="$OPTARG" ;;
+      esac
+    done
+  ;;
+  'u'|'update'|'upgrade')
+    operation='update'
+    help="$help_update"
+    usage="$usage_update"
+
+    while getopts ":hlv:" opt; do
+      case "$opt" in
+      h) help_msg ;;
+      l)
+        get_versions
+        for version in "${versions[@]}"; do
+          grep -q "$(<${data}/version)" <<<"$version" && printf "*"
+          printf "${version}\n"
+        done
+        exit 0
+      ;;
+      v) version="$OPTARG" ;;
+      *) unrecognized_argument ;;
+      esac
+    done
+  ;;
+  *)
+    OPTIND=1
+
+    while getopts ":cfhl:m:uv" opt; do
+      case "$opt" in
+      c)
+        cat "${data}/CHANGELOG.md" | less
+        exit 0
+      ;;
+      f) force=true ;;
+      h) help_msg ;;
+      l) limit="$OPTARG" ;;
+      m) message="$OPTARG" ;;
+      u) setUpstream=true ;;
+      v)
+        cat "${data}/version"
+        exit 0
+      ;;
+      *) unrecognized_argument ;;
+      esac
+    done
+  ;;
+esac
+
+case "$operation" in
+  configure) configure "$@" ;;
+  update) update "$@" ;;
+  *) main "$@" ;;
+esac

@@ -8,9 +8,20 @@ RED="\e[31m"
 YELLOW="\e[33m"
 
 app="$(cat "$(dirname "$0")/.app")"
+skip_prompts=false
+
+while getopts ":y" opt; do
+  case "$opt" in
+  y) skip_prompts=true ;;
+  *)
+    echo "Unrecognized argument"
+    exit 1
+  ;;
+  esac
+done
 
 printf "${BLUE}'$app' will be reinstalled (y/N)${NF}"
-read -sr -n 1 ans
+"$skip_prompts" && ans='y' || read -sr -n 1 ans
 echo
 case "$ans" in
   y|Y) ;;
