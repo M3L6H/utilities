@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.4.1 --
+When listing versions, highlight the installed version in green
+
 -- v0.4.0 --
 Add uninstall subcommand
 

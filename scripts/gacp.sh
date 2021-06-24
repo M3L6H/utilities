@@ -360,8 +360,8 @@ case "$1" in
       l)
         get_versions
         for version in "${versions[@]}"; do
-          grep -q "$(<${data}/version)" <<<"$version" && printf "*"
-          printf "${version}\n"
+          grep -q "$(<${data}/version)" <<<"$version" && printf "${GREEN}*"
+          printf "${version}${NF}\n"
         done
         exit 0
       ;;
