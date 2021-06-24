@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.3.7 --
+Actually add yellow to gacp
+
 -- v0.3.6 --
 Fix upgrade.sh
 

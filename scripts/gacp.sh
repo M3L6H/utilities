@@ -85,6 +85,7 @@ EOF
 NF="\e[0m"
 GREEN="\e[32m"
 RED="\e[31m"
+YELLOW="\e[33m"
 
 # Global vars
 tmp='/var/tmp'
@@ -250,6 +251,7 @@ function update {
 }
 
 function main {
+  echo "$*"
   if "$(<"${data}/.update")" && update "$@"; then
     gacp "$@"
     exit "$?"
