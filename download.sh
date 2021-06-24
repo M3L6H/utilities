@@ -9,6 +9,9 @@ releases="${repo}/releases"
 height="$(tput lines)"
 width="$(tput cols)"
 
+# Colors
+GREEN="\e[32m"
+
 instructions=("Select the utilities you would like to install" "Navigate with the arrow keys" "Press A to select the latest version of each utility" "Press S to toggle a particular utility" "Press D to select all utilities" "Press Q to quit this menu" "Press Enter to confirm your selection" " ")
 offset="${#instructions[@]}"
 
@@ -77,19 +80,23 @@ function print_list {
   local space=$((height - offset))
   local hidden=$((line - space))
   [ "$hidden" -lt 0 ] && hidden=0
-  local i="$hidden" util count=1 str
+  local i="$hidden" util count=1 str block
 
   while [ "$i" -lt "$numlines" ]; do
     util="${names[i]}"
-    str="[$($(${toggles[i]}) && echo 'x' || echo ' ')] ${util}$("${latest[$i]}" && echo ' (latest)')$("${prerelease[$i]}" && echo ' (prerelease)')"
+    str="\033[2K$("${latest[$i]}" && echo "$GREEN")[$($(${toggles[i]}) && echo 'x' || echo ' ')] ${util}$("${latest[$i]}" && echo ' (latest)')$("${prerelease[$i]}" && echo ' (prerelease)')\e[0m"
     [ "${#str}" -gt "$width" ] && str="$(cut -c "1-$((width-3))" <<<"$str")..."
-    println "$str"
+    block="${block}$str"
     i=$((i + 1))
     count=$((count + 1))
-    [ "$count" -gt "$space" ] && break || echo
+    [ "$count" -gt "$space" ] && break || block="${block}\n"
   done
 
+  tput 'civis'
+  echo -en "\033[$((offset + 1));1H"
+  printf "$block"
   echo -en "\033[$((offset + line - hidden));2H"
+  tput 'cnorm'
 }
 
 function print_scr {
@@ -105,6 +112,7 @@ function print_scr {
 
 function exit_handler {
   clear
+  tput 'cnorm'
   [ -z "$1" ] && printf 'Exiting cleanly...\n' || printf "$1"
   exit 0
 }
@@ -165,7 +173,6 @@ function main {
       '') break ;;
       *) ;;
     esac
-    echo -en "\033[$((offset + 1));1H"
     print_list "$line"
   done
 
