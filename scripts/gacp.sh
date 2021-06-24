@@ -366,7 +366,7 @@ case "$1" in
       case "$opt" in
       h) help_msg ;;
       l)
-        list_versions | less -X
+        list_versions | less -rX
         exit 0
       ;;
       v) version="$OPTARG" ;;

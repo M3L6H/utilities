@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.4.4 --
+Interpret color codes with less
+
 -- v0.4.3 --
 Pipe version listing into less
 
