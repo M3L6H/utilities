@@ -1,5 +1,6 @@
 # Changelog
 
+- Thu Jun 24 15:03:22 PDT 2021 - stuff
 - Thu Jun 24 14:59:36 PDT 2021 - Update README intro
 - Thu Jun 24 14:53:43 PDT 2021 - Add .gacprc file
 - Wed Jun 23 11:42:12 PDT 2021 - Make changelog a list
