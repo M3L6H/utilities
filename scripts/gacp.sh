@@ -231,7 +231,7 @@ function update {
   [ -z "$version" ] && version="${versions[0]}"
 
   if [ "${version#*-v}" = "$(<"${data}/version")" ]; then
-    printf "Version ${version} of gapc is already installed\n"
+    printf "${YELLOW}Version ${version#*-v} of gapc is already installed${NF}\n"
     return 1
   fi
 

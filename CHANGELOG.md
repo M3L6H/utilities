@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.3.4 --
+Trim version in update error message and add color to it
+
 -- v0.3.3 --
 Add auto-update functionality
 
