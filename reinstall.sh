@@ -48,6 +48,7 @@ if which $app >/dev/null 2>&1; then
   data="${HOME}/.${app}/"
   cp -r "$(dirname "$0")"/data/* "$data"
   cp "$(dirname "$0")"/*.md "$data"
+  cp "$(dirname "$0")/.app" "$data"
   cp "$(dirname "$0")/uninstall.sh" "$data"
   printf "${GREEN}'${app}' reinstalled${NF}\n"
 else

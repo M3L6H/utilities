@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.4.5 --
+Add .app to the data folder
+
 -- v0.4.4 --
 Interpret color codes with less
 
