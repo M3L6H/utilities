@@ -5,7 +5,7 @@
       "file": "CHANGELOG.md",
       "line": 3,
       "content": {
-        "template": "-- <version> --\n<_msg>\n",
+        "template": "-- v<version> --\n<_msg>\n\n",
         "variables": [
           {
             "name": "version",
