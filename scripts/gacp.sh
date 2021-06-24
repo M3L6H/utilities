@@ -107,7 +107,10 @@ jq="${tmp}/jq"
 
 OPTIND=1 # Used to parse arguments after flags
 
+backup=()
+originals=()
 configure=false
+config="./.gacprc"
 force=false
 limit=""
 message=""
@@ -281,6 +284,94 @@ function update {
   cd "$base_dir"
 }
 
+# Expects the following arguments:
+#   $1: JSON object containing template configuration
+# Returns the filled out template
+function populate_template {
+  local template="$("$jq" -r '.template' <<<"$1")"
+  template="$(sed "s/<_msg>/$message/g" <<<"$template")"
+  local variable variables i=0 cmd
+  IFS=$'\n' variables=($("$jq" -r '.variables[].name' <<<"$1"))
+
+  for variable in "${variables[@]}"; do
+    cmd="$("$jq" -r ".variables[${i}].command" <<<"$1")"
+    template="$(sed "s/<$variable>/$(eval $cmd)/g" <<<"$template")"
+  done
+
+  echo -n "$template"
+}
+
+# Expects the following arguments:
+#   $1: List of actions to perform
+function pre_stage {
+  [ -z "$1" ] && return 1
+
+  local action actions i=0
+  IFS=$'\n' actions=($("$jq" -r '.[].action' <<<"$1"))
+
+  for action in "${actions[@]}"; do
+    case "$action" in
+    'insert')
+      local file="$("$jq" -r ".[${i}].file" <<<"$1")"
+      local line="$("$jq" -r ".[${i}].line" <<<"$1")"
+      local content="$(populate_template "$("$jq" ".[${i}].content" <<< "$1")")"
+      backup+=( "${tmp}/$(random).bckup" )
+      original+=( "$file" )
+      cp "$file" "$backup"
+      ex "$file" <<EOF
+${line} insert
+${content}
+.
+xit
+EOF
+    ;;
+    *)
+      printf "${YELLOW}Unrecognized action '${action}' in pre-stage${NF}\n"
+    ;;
+    esac
+    i=$((i + 1))
+  done
+}
+
+function restore {
+  git reset
+  local file i=0
+  for file in "${backup[@]}"; do
+    cp "$file" "${original[i]}"
+    i=$((i + 1))
+  done
+}
+
+# Expects the following arguments:
+#   $1: List of actions to perform
+function pre_commit {
+  [ -z "$1" ] && return 1
+
+  local action actions i=0
+  IFS=$'\n' actions=($("$jq" -r '.[].action' <<<"$1"))
+
+  for action in "${actions[@]}"; do
+    case "$action" in
+    'insert')
+      printf "${RED}Cannot perform insert action in pre-commit step. Perhaps you meant to put it in pre-stage/${NF}\n"
+      exit 1
+    ;;
+    'validate')
+      local cmd="$("$jq" -r ".[${i}].command" <<<"$1")"
+      if ! eval $cmd; then
+        printf "${RED}Failed pre-commit check: '${cmd}'${NF}\n"
+        restore
+        exit 1
+      fi
+    ;;
+    *)
+      printf "${YELLOW}Unrecognized action '${action}' in pre-stage${NF}\n"
+    ;;
+    esac
+    i=$((i + 1))
+  done
+}
+
 function main {
   if "$(<"${data}/.update")" && update "$@"; then
     gacp "$@"
@@ -305,6 +396,14 @@ function main {
   shift $((OPTIND-1))
   [ "${1:-}" = "--" ] && shift
 
+  if [ -f "$config" ]; then
+    get_jq
+    local pre_stage="$("$jq" '."pre-stage"' <"$config")"
+    local pre_commit="$("$jq" '."pre-commit"' <"$config")"
+  fi
+
+  pre_stage "$pre_stage"
+
   if [ -z "$*" ]; then
     git add .
   else
@@ -316,9 +415,11 @@ function main {
   if ! $force && [ "$numfiles" -gt "$limit" ]; then
     printf "${RED}gacp aborted!${NF}\n"
     printf "${RED}${numfiles} were staged for commit, but only ${limit} are allowed${NF}\n"
-    git reset
+    restore
     exit 1
   fi
+
+  pre_commit "$pre_commit"
 
   git commit -m "$message"
 
@@ -378,12 +479,10 @@ case "$1" in
   *)
     OPTIND=1
 
-    while getopts ":cfhl:m:uv" opt; do
+    while getopts ":c:Cfhl:m:uv" opt; do
       case "$opt" in
-      c)
-        cat "${data}/CHANGELOG.md" | less
-        exit 0
-      ;;
+      c) config="$OPTARG" ;;
+      C) config='' ;;
       f) force=true ;;
       h) help_msg ;;
       l) limit="$OPTARG" ;;

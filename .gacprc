@@ -1,0 +1,24 @@
+{
+  "pre-stage": [
+    {
+      "action": "insert",
+      "file": "CHANGELOG.md",
+      "line": 3,
+      "content": {
+        "template": "-- <version> --\n<_msg>\n",
+        "variables": [
+          {
+            "name": "version",
+            "command": "cat './data/version'"
+          }
+        ]
+      }
+    }
+  ],
+  "pre-commit": [
+    {
+      "action": "validate",
+      "command": "git diff --cached --name-only | grep -q './data/version'"
+    }
+  ]
+}

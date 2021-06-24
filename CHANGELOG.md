@@ -1,5 +1,12 @@
 # Changelog
 
+-- v1.0.0 --
+Add ability for gacp to recognize and parse a `gacprc` file which allows users to specify pre-stage and pre-commit hooks to further automate their workflows
+
+Printing the CHANGELOG has been disabled. `gacp -c <config file>` now specifies the optional path to a `gacprc` file
+
+`gacp -C` prevents `gacp` from looking for a `gacprc` file
+
 -- v0.4.8 --
 Fix bug with regex comparison when pulling jq
 
