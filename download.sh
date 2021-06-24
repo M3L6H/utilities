@@ -1,7 +1,7 @@
 #!/bin/bash
 
 authentication="$1"
-escape_char=$(printf '\u1b')
+escape_char=$'\033'
 tmp="${TMPDIR-/tmp}"
 jq="${tmp}/jq"
 repo='https://api.github.com/repos/m3l6h/utilities'
@@ -84,9 +84,9 @@ function print_list {
 
   while [ "$i" -lt "$numlines" ]; do
     util="${names[i]}"
-    str="\033[2K$("${latest[$i]}" && echo "$GREEN")[$($(${toggles[i]}) && echo 'x' || echo ' ')] ${util}$("${latest[$i]}" && echo ' (latest)')$("${prerelease[$i]}" && echo ' (prerelease)')\e[0m"
+    str="\033[2K[$($(${toggles[i]}) && echo 'x' || echo ' ')] ${util}$("${latest[$i]}" && echo ' (latest)')$("${prerelease[$i]}" && echo ' (prerelease)')"
     [ "${#str}" -gt "$width" ] && str="$(cut -c "1-$((width-3))" <<<"$str")..."
-    block="${block}$str"
+    block="${block}$("${latest[$i]}" && echo "$GREEN")${str}\e[0m"
     i=$((i + 1))
     count=$((count + 1))
     [ "$count" -gt "$space" ] && break || block="${block}\n"
