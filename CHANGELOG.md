@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.3.3 --
+Add auto-update functionality
+
 -- v0.3.2 --
 Update upgrade and downgrade scripts with absolute path to data
 

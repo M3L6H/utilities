@@ -32,7 +32,7 @@ EOF
 usage_config="Usage: gacp config [-l limit]"
 
 read -r -d '' help_config <<EOF
-Usage: gacp config [-l limit]
+Usage: gacp config [-l limit] [-u true/false]
 
 Aliases: c, configure
 
@@ -43,6 +43,7 @@ Description:
 Options:
   -h  Print help
   -l  Configure the default file limit
+  -u  Configure whether gacp should automatically update
 EOF
 
 usage_update="Usage: gacp update [-v version]"
@@ -162,6 +163,7 @@ function get_jq {
 
 function configure {
   configured=false
+
   if [ -n "$limit" ]; then
     if [ "$limit" -gt "$HARDLIMIT" ]; then
       echo "$limitwarning"
@@ -171,14 +173,26 @@ function configure {
       exit 1
     fi
 
-    echo "$limit" > "$data/.limit"
+    echo "$limit" > "${data}/.limit"
     printf "${GREEN}Default limit set to '${limit}'${NF}\n"
+    configured=true
+  fi
+
+  if [ -n "$update_automatically" ]; then
+    if [ "$update_automatically" != 'true' ] && [ "$update_automatically" != 'false' ]; then
+      printf "${RED}The update automatically flag can only be set to 'true' or 'false'${NF}\n"
+      exit 1
+    fi
+
+    echo "$update_automatically" > "${data}/.update"
+    printf "${GREEN}Update automatically set to '${update_automatically}'${NF}\n"
     configured=true
   fi
 
   if ! "$configured"; then
     echo "Printing current configuration..."
     echo "limit: $(<"$data/.limit")"
+    echo "update_automatically: $(<"$data/.update")"
   fi
   exit 0
 }
@@ -236,6 +250,12 @@ function update {
 }
 
 function main {
+  if "$(<"${data}/.update")"; then
+    update "$@"
+    gacp "$@"
+    exit "$?"
+  fi
+
   if [ -z "$message" ]; then
     echo "Commit message is required!"
     echo "$usage"
@@ -287,10 +307,11 @@ case "$1" in
     help="$help_config"
     usage="$usage_config"
 
-    while getopts ":hl:" opt; do
+    while getopts ":hl:u:" opt; do
       case "$opt" in
       h) help_msg ;;
       l) limit="$OPTARG" ;;
+      u) update_automatically="$OPTARG" ;;
       esac
     done
   ;;
