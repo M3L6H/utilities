@@ -1,0 +1,18 @@
+{
+  "pre-stage": [
+    {
+      "action": "insert",
+      "file": "CHANGELOG.md",
+      "line": 3,
+      "content": {
+        "template": "- <date> - <_msg>\n",
+        "variables": [
+          {
+            "name": "date",
+            "command": "date"
+          }
+        ]
+      }
+    }
+  ]
+}
