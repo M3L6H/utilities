@@ -260,7 +260,6 @@ function update {
 }
 
 function main {
-  echo "$*"
   if "$(<"${data}/.update")" && update "$@"; then
     gacp "$@"
     exit "$?"

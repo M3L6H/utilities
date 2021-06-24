@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.3.10 --
+Remove debugging echo
+
 -- v0.3.9 --
 Make -v check remote
 
