@@ -89,5 +89,4 @@ lines of
 
 ```
 Thu Jun 24 14:39:46 PDT 2021 - My commit
-
 ```
