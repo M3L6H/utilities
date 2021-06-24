@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.4.2 --
+Fix copy in reinstall.sh
+
 -- v0.4.1 --
 When listing versions, highlight the installed version in green
 
