@@ -102,7 +102,7 @@ RED="\e[31m"
 YELLOW="\e[33m"
 
 # Global vars
-tmp='/var/tmp'
+tmp="${TMPDIR-/tmp}"
 jq="${tmp}/jq"
 
 OPTIND=1 # Used to parse arguments after flags

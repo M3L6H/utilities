@@ -78,7 +78,7 @@ cp "$(dirname "$0")/uninstall.sh" "$data"
 chmod u+x "${bin}/${app}"
 
 # Get jq
-tmp='/var/tmp'
+tmp="${TMPDIR-/tmp}"
 jq="${tmp}/jq"
 
 jq_remote='https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64'

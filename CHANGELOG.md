@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.4.6 --
+Update tmpdir to support Mac OSX
+
 -- v0.4.5 --
 Add .app to the data folder
 
