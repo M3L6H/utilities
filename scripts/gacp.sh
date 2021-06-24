@@ -304,7 +304,7 @@ function populate_template {
 # Expects the following arguments:
 #   $1: List of actions to perform
 function pre_stage {
-  [ -z "$1" ] && return 1
+  [ -z "$1" ] || [ "$1" = 'null' ] && return 1
 
   local action actions i=0
   IFS=$'\n' actions=($("$jq" -r '.[].action' <<<"$1"))
@@ -345,7 +345,7 @@ function restore {
 # Expects the following arguments:
 #   $1: List of actions to perform
 function pre_commit {
-  [ -z "$1" ] && return 1
+  [ -z "$1" ] || [ "$1" = 'null' ] && return 1
 
   local action actions i=0
   IFS=$'\n' actions=($("$jq" -r '.[].action' <<<"$1"))

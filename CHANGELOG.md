@@ -1,5 +1,7 @@
 # Changelog
 
+-- v1.0.2 --
+Add null check to hooks
 -- v1.0.1 --
 Fix illegal byte sequence error on OSX
 
