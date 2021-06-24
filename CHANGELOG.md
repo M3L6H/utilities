@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.3.8 --
+Fix error after auto update trigger
+
 -- v0.3.7 --
 Actually add yellow to gacp
 

@@ -237,6 +237,8 @@ function update {
   fi
 
   download_url="$("$jq" -r '.[].assets[0].browser_download_url' <<<"$res" | grep "${version//-v/-}")"
+
+  local base_dir="$PWD"
   cd "${tmp}"
   curl -sL "$download_url" -o "gacp.tar.gz"
   local gacp="${tmp}/$(random)"
@@ -248,6 +250,7 @@ function update {
     "${gacp}/downgrade.sh"
 
   "${gacp}/reinstall.sh" -y
+  cd "$base_dir"
 }
 
 function main {
