@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.3.9 --
+Make -v check remote
+
 -- v0.3.8 --
 Fix error after auto update trigger
 

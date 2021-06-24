@@ -83,6 +83,7 @@ EOF
 
 # Colors
 NF="\e[0m"
+BLUE="\e[34m"
 GREEN="\e[32m"
 RED="\e[31m"
 YELLOW="\e[33m"
@@ -202,6 +203,11 @@ function get_versions {
   get_jq
   res="$(gcurl "https://api.github.com/repos/$(<"${data}/remote")/releases")"
   IFS=$'\n' versions=($("$jq" -r '.[].tag_name' <<<"$res" | grep 'gacp'))
+}
+
+function latest_version {
+  get_versions
+  echo "${versions[0]#*-v}"
 }
 
 function random {
@@ -356,6 +362,10 @@ case "$1" in
       u) setUpstream=true ;;
       v)
         cat "${data}/version"
+        latest="$(latest_version)"
+        echo "Latest version is: ${latest}"
+        greater_than "$latest" "$(<"${data}/version")" && \
+          printf "${BLUE}Upgrade with 'gacp update'${NF}\n"
         exit 0
       ;;
       *) unrecognized_argument ;;
