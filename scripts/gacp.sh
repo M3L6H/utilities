@@ -250,8 +250,7 @@ function update {
 }
 
 function main {
-  if "$(<"${data}/.update")"; then
-    update "$@"
+  if "$(<"${data}/.update")" && update "$@"; then
     gacp "$@"
     exit "$?"
   fi

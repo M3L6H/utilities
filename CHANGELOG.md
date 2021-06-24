@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.3.5 --
+Fix infinite loop when auto-updating
+
 -- v0.3.4 --
 Trim version in update error message and add color to it
 
