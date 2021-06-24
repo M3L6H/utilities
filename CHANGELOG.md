@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.3.2 --
+Update upgrade and downgrade scripts with absolute path to data
+
 -- v0.3.1 --
 Add check to prevent "upgrading" to the version already installed
 

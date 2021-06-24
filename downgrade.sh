@@ -1,3 +1,3 @@
 #!/bin/bash
 
-echo "Downgrading to $(<"./data/version")..."
+echo "Downgrading to $(<"$(dirname "$0")/data/version")..."
