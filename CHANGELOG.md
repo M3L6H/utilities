@@ -1,5 +1,7 @@
 # Changelog
 
+-- 1.0.1 --
+Fix illegal byte sequence error on OSX
 -- v1.0.0 --
 Add ability for gacp to recognize and parse a `gacprc` file which allows users to specify pre-stage and pre-commit hooks to further automate their workflows
 

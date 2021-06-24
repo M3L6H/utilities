@@ -18,7 +18,7 @@
   "pre-commit": [
     {
       "action": "validate",
-      "command": "git diff --cached --name-only | grep -q './data/version'"
+      "command": "git diff --cached --name-only | grep -q 'data/version'"
     }
   ]
 }
