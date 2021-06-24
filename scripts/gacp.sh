@@ -14,6 +14,7 @@ Subcommands:
   config    Configure gacp. Use 'gacp config -h' for more info
   configure Alias for config
   u         Alias for update
+  uninstall Uninstall gacp. Use 'gacp uninstall -h' for more info
   update    Update gacp. Use 'gacp update -h' for more info
   upgrade   Alias for update
 
@@ -44,6 +45,18 @@ Options:
   -h  Print help
   -l  Configure the default file limit
   -u  Configure whether gacp should automatically update
+EOF
+
+usage_uninstall="Usage: gacp uninstall"
+
+read -r -d '' help_uninstall <<EOF
+Usage: gacp uninstall
+
+Description:
+  Removes gacp completely from your system. You will lose all your configs.
+
+Options:
+  -h  Print help
 EOF
 
 usage_update="Usage: gacp update [-v version]"
@@ -324,6 +337,18 @@ case "$1" in
       esac
     done
   ;;
+  'uninstall')
+    operation='uninstall'
+    help="$help_uninstall"
+    usage="$usage_uninstall"
+
+    while getopts ":h" opt; do
+      case "$opt" in
+      h) help_msg ;;
+      *) unrecognized_argument ;;
+      esac
+    done
+  ;;
   'u'|'update'|'upgrade')
     operation='update'
     help="$help_update"
@@ -374,7 +399,11 @@ case "$1" in
 esac
 
 case "$operation" in
-  configure) configure "$@" ;;
-  update) update "$@" ;;
+  'configure') configure "$@" ;;
+  'uninstall')
+    "${data}/uninstall.sh"
+    exit "$?"
+  ;;
+  'update') update "$@" ;;
   *) main "$@" ;;
 esac

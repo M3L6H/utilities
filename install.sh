@@ -73,6 +73,7 @@ data="${HOME}/.${app}"
 mkdir -p "$data"
 cp -a "$(dirname "$0")/data/." "$data"
 cp $(dirname "$0")/*.md "$data"
+cp "$(dirname "$0")/uninstall.sh" "$data"
 chmod u+x "${bin}/${app}"
 
 # Get jq

@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.4.0 --
+Add uninstall subcommand
+
 -- v0.3.10 --
 Remove debugging echo
 
