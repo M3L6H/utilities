@@ -1,5 +1,8 @@
 # Changelog
 
+-- v0.3.6 --
+Fix upgrade.sh
+
 -- v0.3.5 --
 Fix infinite loop when auto-updating
 
