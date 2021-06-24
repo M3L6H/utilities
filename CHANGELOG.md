@@ -1,5 +1,6 @@
 # Changelog
 
+- Thu Jun 24 14:59:36 PDT 2021 - Update README intro
 - Thu Jun 24 14:53:43 PDT 2021 - Add .gacprc file
 - Wed Jun 23 11:42:12 PDT 2021 - Make changelog a list
 - Wed Jun 23 11:38:53 PDT 2021 - Update download script to print nicely on small screens and to select latest version with the "select all" key

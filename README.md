@@ -1,7 +1,6 @@
 # Utilities
 
-A collection of utilities I have personally found helpful in my development
-career.
+A collection of bash utilities I use on a daily basis.
 
 ## How to Install
 
