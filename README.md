@@ -5,6 +5,12 @@
 A utility that combines `git add`, `git commit`, and `git push` into one
 command.
 
+Install it by running
+
+```sh
+bash <(curl -s 'https://raw.githubusercontent.com/M3L6H/utilities/master/download.sh')
+```
+
 ## Usage
 
 Run `gacp` with the `-m` flag to provide a commit message. If no files are
