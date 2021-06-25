@@ -1,7 +1,11 @@
 # Changelog
 
+### -- v1.0.4 --
+Actually fix insertions of lines via pre-stage hooks
+
 ### -- v1.0.3 --
 Fix trailing newlines getting trimmed
+
 ### -- v1.0.2 --
 Add null check to hooks
 

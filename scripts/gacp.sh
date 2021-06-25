@@ -288,7 +288,7 @@ function update {
 #   $1: JSON object containing template configuration
 # Returns the filled out template
 function populate_template {
-  local template="$("$jq" -r '.template' <<<"$1")"
+  local template="$("$jq" -r '.template' <<<"$1"; echo '.')"
   template="$(sed "s/<_msg>/$message/g" <<<"$template")"
   local variable variables i=0 cmd
   IFS=$'\n' variables=($("$jq" -r '.variables[].name' <<<"$1"))
@@ -314,7 +314,7 @@ function pre_stage {
     'insert')
       local file="$("$jq" -r ".[${i}].file" <<<"$1")"
       local line="$("$jq" -r ".[${i}].line" <<<"$1")"
-      local content="$(populate_template "$("$jq" ".[${i}].content" <<< "$1")"; echo '.')"
+      local content="$(populate_template "$("$jq" ".[${i}].content" <<< "$1")")"
       backup+=( "${tmp}/$(random).bckup" )
       original+=( "$file" )
       cp "$file" "$backup"
