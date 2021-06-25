@@ -1,5 +1,7 @@
 # Changelog
 
+### -- v1.0.3 --
+Fix trailing newlines getting trimmed
 ### -- v1.0.2 --
 Add null check to hooks
 

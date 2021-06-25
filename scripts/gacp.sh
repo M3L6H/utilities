@@ -314,13 +314,13 @@ function pre_stage {
     'insert')
       local file="$("$jq" -r ".[${i}].file" <<<"$1")"
       local line="$("$jq" -r ".[${i}].line" <<<"$1")"
-      local content="$(populate_template "$("$jq" ".[${i}].content" <<< "$1")")"
+      local content="$(populate_template "$("$jq" ".[${i}].content" <<< "$1")"; echo '.')"
       backup+=( "${tmp}/$(random).bckup" )
       original+=( "$file" )
       cp "$file" "$backup"
       ex "$file" <<EOF
 ${line} insert
-${content}
+${content%.}
 .
 xit
 EOF
