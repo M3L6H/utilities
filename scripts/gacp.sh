@@ -10,21 +10,20 @@ read -r -d '' help <<EOF
 ${usage}
 
 Subcommands:
-  c         Alias for config
-  config    Configure gacp. Use 'gacp config -h' for more info
-  configure Alias for config
-  u         Alias for update
-  uninstall Uninstall gacp. Use 'gacp uninstall -h' for more info
-  update    Update gacp. Use 'gacp update -h' for more info
-  upgrade   Alias for update
+  c         |Alias for config
+  config    |Configure gacp. Use 'gacp config -h' for more info
+  configure |Alias for config
+  u         |Alias for update
+  uninstall |Uninstall gacp. Use 'gacp uninstall -h' for more info
+  update    |Update gacp. Use 'gacp update -h' for more info
+  upgrade   |Alias for update
 
 Options:
-  -f  Force gacp to ignore its limits. This does NOT run a force push. Instead,
-      gacp will ignore things such as the limit on number of files to push.
-  -h  Print help
-  -l  Sets a limit on the number of files to commit before 'gacp' aborts
-  -m  Specify commit message
-  -u  Automatically run with '--set-upstream origin <current branch>'
+  -f  |Force gacp to ignore its limits. This does NOT run a force push. Instead, gacp will ignore things such as the limit on number of files to push.
+  -h  |Print help
+  -l  |Sets a limit on the number of files to commit before 'gacp' aborts
+  -m  |Specify commit message
+  -u  |Automatically run with '--set-upstream origin <current branch>'
 
 Details:
   https://github.com/M3L6H/utilities/tree/gacp
@@ -33,18 +32,17 @@ EOF
 usage_config="Usage: gacp config [-l limit]"
 
 read -r -d '' help_config <<EOF
-Usage: gacp config [-l limit] [-u true/false]
+Usage: |gacp config [-l limit] [-u true/false]
 
 Aliases: c, configure
 
 Description:
-  Configures gacp. When run without flags, prints out the current gacp
-  configuration.
+  |Configures gacp. When run without flags, prints out the current gacp configuration.
 
 Options:
-  -h  Print help
-  -l  Configure the default file limit
-  -u  Configure whether gacp should automatically update
+  -h  |Print help
+  -l  |Configure the default file limit
+  -u  |Configure whether gacp should automatically update
 EOF
 
 usage_uninstall="Usage: gacp uninstall"
@@ -53,45 +51,39 @@ read -r -d '' help_uninstall <<EOF
 Usage: gacp uninstall
 
 Description:
-  Removes gacp completely from your system. You will lose all your configs.
+  |Removes gacp completely from your system. You will lose all your configs.
 
 Options:
-  -h  Print help
+  -h  |Print help
 EOF
 
 usage_update="Usage: gacp update [-v version]"
 
 read -r -d '' help_update <<EOF
-Usage: gacp update [-v version]
-       gacp update -l
+Usage: |gacp update [-v version]
+       |gacp update -l
 
 Aliases: u, upgrade
 
 Description:
-  Updates gacp. When run without flags, updates to the latest gacp version. If
-  the -v flag was passed, it will update to the specified version.
-  List available versions by running it with -l.
+  |Updates gacp. When run without flags, updates to the latest gacp version. If the -v flag was passed, it will update to the specified version.
+
+  |List available versions by running it with -l.
 
 Options:
-  -h  Print help
-  -l  List available versions
-  -v  Update to a specific version
+  -h  |Print help
+  -l  |List available versions
+  -v  |Update to a specific version
 EOF
 
 read -r -d '' limitwarning <<EOF
-You are seeing this because you have tried to set the file limit for gacp to a
-number greater than ${HARDLIMIT}.
+You are seeing this because you have tried to set the file limit for gacp to a number greater than ${HARDLIMIT}.
 
-The point of the file limit is to prevent you from accidentally pushing an
-inordinate number of files to source control. For example, in the case where you
-forgot to gitignore your node_modules folder.
+The point of the file limit is to prevent you from accidentally pushing an inordinate number of files to source control. For example, in the case where you forgot to gitignore your node_modules folder.
 
-As a tool, gacp is designed to make small incremental changes quicker and easier
-to push to source control. If you are going to push a large number of files at
-once, you should probably use traditional git commands.
+As a tool, gacp is designed to make small incremental changes quicker and easier to push to source control. If you are going to push a large number of files at once, you should probably use traditional git commands.
 
-However, in the case that you want to have your way, the -f flag exists for this
-very purpose.
+However, in the case that you want to have your way, the -f flag exists for this very purpose.
 EOF
 
 # Colors
@@ -117,8 +109,16 @@ message=""
 setUpstream=false
 
 # Functions
+# Expected arguments:
+#   $1: The message to print
+function print_msg {
+  local width="$(tput cols)"
+  echo "$1" | awk -v width="$width" '{ i=1; col=index($0, "|"); if (col > 0) { col--; } while (i <= length($0)) { offset=i+width; if (i > 1) { offset-=col; } while(offset >= i) { if (substr($0, offset - 1, 1) == " " || offset >= length($0)) { break; } offset--; } if (offset == i) { offset=i+width; if (i > 1) { offset-=col; } } str=substr($0, i, offset - i); if (i > 1) { printf "%*s", col, "" } gsub(/\|/, "", str); print str; i=offset; } if (length($0) == 0) { print; } }'
+}
+
 function help_msg {
-  echo "$help" | less
+  # print_msg "$help" | less
+  print_msg "$help"
   exit 0
 }
 
@@ -185,7 +185,7 @@ function configure {
 
   if [ -n "$limit" ]; then
     if [ "$limit" -gt "$HARDLIMIT" ]; then
-      echo "$limitwarning"
+      print_msg "$limitwarning"
       exit 1
     elif [ "$limit" -lt 1 ]; then
       echo "Limit cannot be less than 1! Got '${limit}'."
@@ -388,7 +388,7 @@ function main {
   [ -z "$limit" ] && limit="$(<"$data/.limit")"
 
   if [ "$limit" -gt "$HARDLIMIT" ]; then
-    echo "$limitwarning"
+    print_msg "$limitwarning"
     exit 1
   fi
 

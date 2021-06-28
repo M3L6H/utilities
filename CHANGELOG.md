@@ -1,5 +1,8 @@
 # Changelog
 
+### -- v1.1.0 --
+Add pretty printing
+
 ### -- v1.0.4 --
 Actually fix insertions of lines via pre-stage hooks
 
