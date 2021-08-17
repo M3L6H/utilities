@@ -19,6 +19,8 @@ Subcommands:
   upgrade   |Alias for update
 
 Options:
+  -c  |Supply a path to a .gacprc file
+  -C  |Skip any automation outlined in a .gacprc file
   -f  |Force gacp to ignore its limits. This does NOT run a force push. Instead, gacp will ignore things such as the limit on number of files to push.
   -h  |Print help
   -l  |Sets a limit on the number of files to commit before 'gacp' aborts

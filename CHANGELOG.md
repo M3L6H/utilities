@@ -1,5 +1,8 @@
 # Changelog
 
+### -- v1.1.1 --
+Update help message with info about gacprc
+
 ### -- v1.1.0 --
 Add pretty printing
 
